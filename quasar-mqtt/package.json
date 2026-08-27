@@ -1,31 +1,39 @@
 {
   "name": "quasar-mqtt",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
+  "description": "Driverbot MQTT-chat: Quasar-app som pratar med skolans MQTT-broker via WebSockets",
+  "productName": "Driverbot MQTT",
   "author": "abbjetmus <jeton.mustini@abbindustrigymnasium.se>",
+  "type": "module",
   "private": true,
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "postinstall": "quasar prepare --silent"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
-    "mqtt": "^4.3.7",
-    "pinia": "^2.0.11",
-    "quasar": "^2.6.0",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "@quasar/extras": "^2.0.4",
+    "mqtt": "^5.15.2",
+    "pinia": "^4.0.2",
+    "quasar": "^2.27.0",
+    "vue": "^3.5.22",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@quasar/app-vite": "^1.0.0",
-    "autoprefixer": "^10.4.2",
-    "postcss": "^8.4.14"
+    "@quasar/app-vite": "^3.8.1",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8"
   },
+  "keywords": [
+    "quasar",
+    "quasar-app",
+    "quasar-cli",
+    "quasar-app-vite",
+    "vite",
+    "vue",
+    "vuejs"
+  ],
   "engines": {
-    "node": "^18 || ^16 || ^14.19",
-    "npm": ">= 6.13.4",
-    "yarn": ">= 1.21.1"
+    "node": ">= 26 || ^24 || ^22.12"
   }
 }

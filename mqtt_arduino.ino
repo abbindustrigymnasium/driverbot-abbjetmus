@@ -1,84 +1,93 @@
+// mqtt_arduino.ino — ESP8266 som chattar med Quasar-appen via skolans MQTT-broker
+//
+// Bibliotek (Arduino IDE -> Library Manager): "EspMQTTClient" (drar in PubSubClient).
+// Kort: ESP8266 (NodeMCU / Wemos D1 mini). Välj rätt kort under Tools -> Board.
+//
+// Så funkar det:
+//   - ESP:n ansluter till skolans broker och prenumererar på samma topic som webbappen.
+//   - Skriv "on" eller "off" i chatten -> lampan tänds/släcks.
+//   - ESP:n svarar i chatten som användaren "esp8266" så att du ser att den lever.
+//
+// Broker:  mqtt-broker.cloud.mustini.com, port 1883, ingen inloggning.
+// Topic:   samma som TOPIC i quasar-mqtt/src/boot/mqtt-boot.js (byt till ditt eget prefix!)
+
 #include "EspMQTTClient.h"
-//Install libraries PubSubClient and EspMQTTClient
 
+// ==================== ANPASSA ====================
+#define WIFI_SSID     "Hitachigymnasiet_2.4"
+#define WIFI_PASSWORD "..."
+#define MQTT_BROKER   "mqtt-broker.cloud.mustini.com"
+#define MQTT_PORT     1883
+#define CLIENT_NAME   "esp8266-abbjetmus"      // måste vara unikt på brokern – byt till ditt namn
+#define TOPIC         "abbjetmus/chat"         // samma som i webbappen
 
-void onConnectionEstablished();
+#define LED_PIN       LED_BUILTIN               // inbyggd lampa. Extern lampa: t.ex. D1
+#define LED_ACTIVE_LOW true                     // inbyggda lampan på ESP8266 lyser vid LOW
+// =================================================
 
-//Gamla sättet
-/*EspMQTTClient client(
- "Nätverksnamn",           // Wifi ssid
-  "password",           // Wifi password
-  "mqtt-broker.cloud.mustini.com",  // MQTT broker (skolans, ingen inloggning)
-  1883,             // MQTT broker port
-  "",               // MQTT username (lämna tomt)
-  "",               // MQTT password (lämna tomt)
-  "klientnamn",          // Client name
-  onConnectionEstablished, // Connection established callback
-  true,             // Enable web updater
-  true              // Enable debug messages
-);*/
-//Nya sättet!
 EspMQTTClient client(
- "Nätverksnamn",           // Wifi ssid
-  "password",           // Wifi password
-  "mqtt-broker.cloud.mustini.com",  // MQTT broker (skolans, ingen inloggning)
-  "",               // MQTT username (lämna tomt)
-  "",               // MQTT password (lämna tomt)
-  "klientnamn",          // Client name
-  1883            // MQTT broker port
+  WIFI_SSID, WIFI_PASSWORD,
+  MQTT_BROKER,
+  "", "",                                       // användarnamn/lösenord: inget krävs
+  CLIENT_NAME,
+  MQTT_PORT
 );
- 
-//Extern lampa
-//#define led_pin D1
 
+bool lampaPa = false;
+
+void sattLampa(bool pa) {
+  lampaPa = pa;
+  digitalWrite(LED_PIN, (pa != LED_ACTIVE_LOW) ? HIGH : LOW);
+  Serial.println(pa ? "Lampan PÅ" : "Lampan AV");
+}
+
+// Skicka ett meddelande som dyker upp som en chattbubbla i webbappen.
+// Webbappen förväntar sig JSON: {"user": "...", "message": "..."}
+void skickaTillChatten(const String& text) {
+  String json = "{\"user\":\"esp8266\",\"message\":\"" + text + "\"}";
+  client.publish(TOPIC, json);
+}
+
+// Plocka ut "message" ur JSON utan bibliotek (räcker för enkla strängar utan citattecken i).
+String hamtaMessage(const String& json) {
+  int start = json.indexOf("\"message\":\"");
+  if (start < 0) return "";
+  start += 11;
+  int slut = json.indexOf("\"", start);
+  return slut < 0 ? "" : json.substring(start, slut);
+}
+
+void onConnectionEstablished() {
+  Serial.println("MQTT ansluten till " MQTT_BROKER);
+
+  client.subscribe(TOPIC, [](const String& payload) {
+    Serial.println("Mottaget: " + payload);
+
+    String text = hamtaMessage(payload);
+    if (payload.indexOf("\"user\":\"esp8266\"") >= 0) return;   // ignorera våra egna meddelanden
+
+    text.toLowerCase();
+    if (text == "on" || text == "på") {
+      sattLampa(true);
+      skickaTillChatten("Lampan är PÅ");
+    } else if (text == "off" || text == "av") {
+      sattLampa(false);
+      skickaTillChatten("Lampan är AV");
+    } else if (text == "status") {
+      skickaTillChatten(lampaPa ? "Lampan är PÅ" : "Lampan är AV");
+    }
+  });
+
+  skickaTillChatten("ESP8266 online. Skriv on / off / status.");
+}
 
 void setup() {
-//pinMode(led_pin, OUTPUT);//Externlampa 
-//digitalWrite(led_pin,LOW);
-pinMode(LED_BUILTIN, OUTPUT); //Inbyggd lampa på kortet
-digitalWrite(LED_BUILTIN,LOW);
-Serial.begin(115200);
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  sattLampa(false);
+  client.enableDebuggingMessages();             // WiFi/MQTT-status i Serial Monitor
 }
-
-bool off=false;
-
-void lampa(){
-  if(off==true)
-  {
-  Serial.println("Släckt!");
-  off=false;
-  }
-  else
-  {
-  off=true;
-  
-  Serial.println("Släckt!");
-  }
-
-//digitalWrite(led_pin,off);//Externlampa
-digitalWrite(LED_BUILTIN,off);//Inbyggd lampa på kortet
-  
-}
-
-void onConnectionEstablished()
-{
-  client.subscribe("abbjetmus/lampa", [] (const String &payload)
-  {
-    Serial.println(payload);
-//    if(payload=="on")
-  //  onlampa();
-    lampa();
-  });
-  
-  client.publish("abbjetmus/lampa", "This is a message");
-
-  client.executeDelayed(5 * 1000, []() {
-    client.publish("abbjetmus/lampa", "This is a message sent 5 seconds later");
-  });
-}
-
 
 void loop() {
-  // put your main code here, to run repeatedly:
-client.loop();
+  client.loop();
 }

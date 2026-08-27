@@ -23,7 +23,17 @@ Alla exempel i det här repot är inställda mot skolans broker, en Eclipse Mosq
 - Körs webbsidan över **https** måste du ansluta med `wss://`, annars blockerar webbläsaren `ws://` (mixed content). Lokalt med `quasar dev` (http) fungerar `ws://`.
 - Brokerns konfiguration ligger i repot `HitachiGymnasiet/mqtt-broker`.
 
-Webbappen: `cd quasar-mqtt && npm install && npm run dev`. Adress och topic ändras i `src/boot/mqtt-boot.js`.
+**Webbappen** (`quasar-mqtt/`, Quasar v2.27 med `@quasar/app-vite` v3, kräver **Node 22.12+**):
+
+```bash
+cd quasar-mqtt
+npm install
+npm run dev
+```
+
+Adress och topic ändras i `src/boot/mqtt-boot.js`. Sidan väljer själv `ws://…:9001` (http) eller `wss://…` (https). OBS: `index.html` har en Content-Security-Policy — byter du broker måste den nya adressen in under `connect-src`.
+
+**ESP8266** (`mqtt_arduino.ino`): lyssnar på samma topic som chatten. Skriv `on`, `off` eller `status` i webbappen så tänds/släcks lampan, och ESP:n svarar i chatten som användaren `esp8266`.
 
 ## Vad är MQTT
 
