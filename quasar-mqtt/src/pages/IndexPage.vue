@@ -17,19 +17,19 @@
 </template>
 
 <script setup>
-import { client } from "src/boot/mqtt-boot"
+import { client, TOPIC } from "src/boot/mqtt-boot"
 import { ref, onMounted } from 'vue'
 
 onMounted(() => {
   client.on("connect", () => {
     console.log("Conntected!")
-    client.subscribe("topic", function (err) {
+    client.subscribe(TOPIC, function (err) {
       if (!err) {
         let info = JSON.stringify({
           user: "salle",
           message: "Hello mqtt",
         })
-        client.publish("topic", info)
+        client.publish(TOPIC, info)
       }
     })
   })
@@ -49,7 +49,7 @@ const publish = () => {
     user: "salle",
     message: publishMessage.value,
   })
-  client.publish("topic", info)
+  client.publish(TOPIC, info)
   publishMessage.value = ""
 }
 

@@ -8,6 +8,23 @@
 - <a href="https://chrome.google.com/webstore/detail/mqttbox/kaajoficamnjijhkeomgfljpicifbkaf/related?pli=1">MQTT Box för att testa broker</a>
 - <a href="https://www.youtube.com/watch?v=f4JmhGBsRkQ">https://www.youtube.com/watch?v=f4JmhGBsRkQ</a>
 
+## Skolans broker
+
+Alla exempel i det här repot är inställda mot skolans broker, en Eclipse Mosquitto på CapRover:
+
+| Klient | Adress | Inloggning |
+|---|---|---|
+| Webbläsare (MQTT.js över WebSockets) | `ws://mqtt-broker.cloud.mustini.com:9001` | ingen |
+| ESP8266 (EspMQTTClient / PubSubClient) | `mqtt-broker.cloud.mustini.com`, port `1883` | ingen |
+| Terminal | `mosquitto_pub -h mqtt-broker.cloud.mustini.com -t abbjetmus/chat -m hej` | ingen |
+
+- Brokern är **gemensam** – använd ett eget prefix på dina topics (t.ex. `fornamn/chat`) så du inte krockar med andra.
+- Använd ett **unikt clientId** per klient. Två klienter med samma id sparkar ut varandra.
+- Körs webbsidan över **https** måste du ansluta med `wss://`, annars blockerar webbläsaren `ws://` (mixed content). Lokalt med `quasar dev` (http) fungerar `ws://`.
+- Brokerns konfiguration ligger i repot `HitachiGymnasiet/mqtt-broker`.
+
+Webbappen: `cd quasar-mqtt && npm install && npm run dev`. Adress och topic ändras i `src/boot/mqtt-boot.js`.
+
 ## Vad är MQTT
 
 MQTT (Message Queuing Telemetry Transport) är ett kommunikationsprotokoll som används för att skicka meddelanden mellan enheter över nätverk, vanligtvis inom Internet of Things (IoT). Det är ett lättviktigt protokoll som är utformat för att vara energieffektivt och resursbesparande, vilket gör det lämpligt för anslutning av små enheter med begränsad kapacitet och bandbredd.

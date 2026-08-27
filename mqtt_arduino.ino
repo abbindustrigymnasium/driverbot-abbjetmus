@@ -8,10 +8,10 @@ void onConnectionEstablished();
 /*EspMQTTClient client(
  "Nätverksnamn",           // Wifi ssid
   "password",           // Wifi password
-  "maqiatto.com",  // MQTT broker ip
+  "mqtt-broker.cloud.mustini.com",  // MQTT broker (skolans, ingen inloggning)
   1883,             // MQTT broker port
-  "användarnamn på maqiatton",            // MQTT username
-  "password",       // MQTT password
+  "",               // MQTT username (lämna tomt)
+  "",               // MQTT password (lämna tomt)
   "klientnamn",          // Client name
   onConnectionEstablished, // Connection established callback
   true,             // Enable web updater
@@ -21,9 +21,9 @@ void onConnectionEstablished();
 EspMQTTClient client(
  "Nätverksnamn",           // Wifi ssid
   "password",           // Wifi password
-  "maqiatto.com",  // MQTT broker ip
-  "användarnamn på maqiatton",            // MQTT username
-  "password",       // MQTT password
+  "mqtt-broker.cloud.mustini.com",  // MQTT broker (skolans, ingen inloggning)
+  "",               // MQTT username (lämna tomt)
+  "",               // MQTT password (lämna tomt)
   "klientnamn",          // Client name
   1883            // MQTT broker port
 );
@@ -62,7 +62,7 @@ digitalWrite(LED_BUILTIN,off);//Inbyggd lampa på kortet
 
 void onConnectionEstablished()
 {
-  client.subscribe("joakim.flink@abbindustrigymnasium.se/lampa", [] (const String &payload)
+  client.subscribe("abbjetmus/lampa", [] (const String &payload)
   {
     Serial.println(payload);
 //    if(payload=="on")
@@ -70,10 +70,10 @@ void onConnectionEstablished()
     lampa();
   });
   
-  client.publish("joakim.flink@abbindustrigymnasium.se/lampa", "This is a message");
+  client.publish("abbjetmus/lampa", "This is a message");
 
   client.executeDelayed(5 * 1000, []() {
-    client.publish("joakim.flink@abbindustrigymnasium.se/lampa", "This is a message sent 5 seconds later");
+    client.publish("abbjetmus/lampa", "This is a message sent 5 seconds later");
   });
 }
 
