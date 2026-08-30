@@ -6,7 +6,7 @@ Det här repot är kursmaterialet om **MQTT** på Hitachigymnasiet. Det innehål
 |---|---|
 | [MQTT-introduktion.pptx](MQTT-introduktion.pptx) | Genomgång: hur MQTT fungerar, Arduino, webbsida, felsökning |
 | [mqtt_arduino.ino](mqtt_arduino.ino) | ESP8266-sketch: lyssnar på chatten, styr en lampa, svarar |
-| [quasar-mqtt/](quasar-mqtt/) | Webbapp (Quasar + MQTT.js): chatt över MQTT |
+| [quasar-mqtt/](quasar-mqtt/) | Webbapp (Quasar + MQTT.js): chatt över MQTT. Varje flik blir en egen användare — öppna två flikar och chatta med dig själv |
 | [mosquitto-broker/](mosquitto-broker/) | Konfigurationen för skolans broker (Eclipse Mosquitto på CapRover) |
 
 ## Snabbstart: skolans broker

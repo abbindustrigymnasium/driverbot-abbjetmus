@@ -28,5 +28,5 @@ Byt `TOPIC` (`abbjetmus/chat`) till ditt eget prefix. Brokern är gemensam för 
 ## Struktur
 
 - `src/boot/mqtt-boot.js` — skapar MQTT-klienten en gång vid start, exporterar `client`, `TOPIC`, `BROKER_URL`
-- `src/pages/IndexPage.vue` — chatten: prenumererar, publicerar, visar meddelanden
+- `src/pages/IndexPage.vue` — chatten: prenumererar, publicerar, visar meddelanden. Frågar efter namn när sidan öppnas och sparar det i `sessionStorage`, som är **per flik** — öppna en ny flik så blir du en ny användare. Klicka på namn-chipen för att byta. Chatten har ingen historik — MQTT sparar inte meddelanden, så en ny flik ser bara det som skickas efter att den anslutit.
 - `src/layouts/MainLayout.vue` — rubrik och länkar
