@@ -274,7 +274,7 @@ Ibland vill man testa utan internet, eller ha en broker bara för klassrummet. K
 - [MQTT Essentials (HiveMQ)](https://www.hivemq.com/mqtt-essentials/) — den bästa genomgången av protokollet, på engelska
 - [mqtt.org](https://mqtt.org/) — specifikationen och lista över bibliotek
 - [MQTT.js](https://github.com/mqttjs/MQTT.js) — webbläsare och Node
-- [EspMQTTClient](https://github.com/plapointe6/EspMQTTClient) — ESP8266/ESP32
+- [EspMQTTClient](https://github.com/plapointe6/EspMQTTClient) — ESP8266
 - [MQTTX](https://mqttx.app/) — grafisk testklient
 - [Video: MQTT förklarat på 10 minuter](https://www.youtube.com/watch?v=f4JmhGBsRkQ)
 - [vue-joystick-component](https://superhussain.github.io/vue-joystick-component/#/story/stories-joystick-story-vue?variantId=_default) — joystick till bilstyrning i Vue
