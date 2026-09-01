@@ -5,7 +5,8 @@
 //
 // Så funkar det:
 //   - ESP:n ansluter till skolans broker och prenumererar på samma topic som webbappen.
-//   - Skriv "on" eller "off" i chatten -> lampan tänds/släcks.
+//   - Varje meddelande i chatten -> inbyggda lampan blinkar i 2 sekunder.
+//   - Skriv "on" eller "off" i chatten -> lampan tänds/släcks permanent.
 //   - ESP:n svarar i chatten som användaren "esp8266" så att du ser att den lever.
 //
 // Broker:  mqtt-broker.cloud.mustini.com, port 1883, ingen inloggning.
@@ -33,11 +34,20 @@ EspMQTTClient client(
   MQTT_PORT
 );
 
-bool lampaPa = false;
+bool lampaPa = false;                 // grundläge, styrs med on/off i chatten
+unsigned long blinkTill = 0;          // lampan blinkar fram till denna tidpunkt
+const unsigned long BLINK_MS = 2000;  // hur länge lampan lyser per meddelande
+
+// Lampan lyser om grundläget är PÅ eller om vi är mitt i en meddelande-blink.
+// Ingen delay() någonstans – client.loop() måste få köra hela tiden.
+void uppdateraLampa() {
+  bool tand = lampaPa || millis() < blinkTill;
+  digitalWrite(LED_PIN, (tand != LED_ACTIVE_LOW) ? HIGH : LOW);
+}
 
 void sattLampa(bool pa) {
   lampaPa = pa;
-  digitalWrite(LED_PIN, (pa != LED_ACTIVE_LOW) ? HIGH : LOW);
+  uppdateraLampa();
   Serial.println(pa ? "Lampan PÅ" : "Lampan AV");
 }
 
@@ -62,6 +72,7 @@ void onConnectionEstablished() {
 
   client.subscribe(TOPIC, [](const String& payload) {
     Serial.println("Mottaget: " + payload);
+    blinkTill = millis() + BLINK_MS;   // varje meddelande -> lys i 2 sekunder
 
     String text = hamtaMessage(payload);
     if (payload.indexOf("\"user\":\"esp8266\"") >= 0) return;   // ignorera våra egna meddelanden
@@ -90,4 +101,5 @@ void setup() {
 
 void loop() {
   client.loop();
+  uppdateraLampa();
 }
