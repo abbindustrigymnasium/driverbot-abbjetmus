@@ -58,11 +58,12 @@ void skickaTillChatten(const String& text) {
   client.publish(TOPIC, json);
 }
 
-// Plocka ut "message" ur JSON utan bibliotek (räcker för enkla strängar utan citattecken i).
-String hamtaMessage(const String& json) {
-  int start = json.indexOf("\"message\":\"");
+// Plocka ut ett fält ur JSON utan bibliotek (räcker för enkla strängar utan citattecken i).
+String hamtaFalt(const String& json, const String& falt) {
+  String nyckel = "\"" + falt + "\":\"";
+  int start = json.indexOf(nyckel);
   if (start < 0) return "";
-  start += 11;
+  start += nyckel.length();
   int slut = json.indexOf("\"", start);
   return slut < 0 ? "" : json.substring(start, slut);
 }
@@ -71,10 +72,18 @@ void onConnectionEstablished() {
   Serial.println("MQTT ansluten till " MQTT_BROKER);
 
   client.subscribe(TOPIC, [](const String& payload) {
-    Serial.println("Mottaget: " + payload);
     blinkTill = millis() + BLINK_MS;   // varje meddelande -> lys i 2 sekunder
 
-    String text = hamtaMessage(payload);
+    String text = hamtaFalt(payload, "message");
+    String anvandare = hamtaFalt(payload, "user");
+
+    // Skriv ut meddelandet i Serial Monitor (115200 baud)
+    if (text.length() > 0) {
+      Serial.println("[chatt] " + anvandare + ": " + text);
+    } else {
+      Serial.println("[chatt] okant format: " + payload);
+    }
+
     if (payload.indexOf("\"user\":\"esp8266\"") >= 0) return;   // ignorera våra egna meddelanden
 
     text.toLowerCase();
